@@ -29,15 +29,6 @@ const path = {
         sass:`${srcFolder}/sass/*.sass`,
         img: `${srcFolder}/img/*.+ (jpg | jpeg | png | gif)`,
     },
-    watch: {
-            html:`${srcFolder}/html/*.html`,
-            js:`${srcFolder}/js/*.js`,
-            css:`${srcFolder}/css/*.css`,
-            fonts: `${srcFolder}/fonts/*.*`,
-            img:`${srcFolder}/img/*.*`,
-            sass:`${srcFolder}/sass/*.sass`,
-            files:`${srcFolder}/*`  
-        },
         clean:buildFolder,
         buildFolder:buildFolder,
         srcFolder:srcFolder,
@@ -52,7 +43,7 @@ global.app = {
 const html = () => {
     return app.gulp.src (path.src.html)
     .pipe (app.gulp.dest (path.build.html))
-    .pipe(browsersync.stream());
+    .pipe(browsersync.stream())
 }
 
 const css = () => {
@@ -71,6 +62,7 @@ const task_sass = () => {
     .pipe (cssnano ())
     .pipe (rename ({suffix: '.min'}))
     .pipe(app.gulp.dest(path.build.sass))
+    .pipe(browsersync.stream());
 }
 
 const scripts =  () => {
@@ -79,6 +71,7 @@ const scripts =  () => {
  .pipe (uglify ())
  .pipe (rename ({suffix: '.min'}))
  .pipe (app.gulp.dest (path.build.js)) 
+ .pipe(browsersync.stream())
 }
 
 const imgs =  () => {
@@ -92,26 +85,21 @@ const imgs =  () => {
 }
 
 const watch = () => {
-    gulp.watch (path.build.html).on('change', browsersync.reload)
-    gulp.watch (path.watch.html,  html)
-    gulp.watch (path.watch.js, scripts)
-    gulp.watch (path.watch.sass, task_sass)
-    gulp.watch (path.watch.img, imgs)
+    browsersync.init({
+        server:{
+            baseDir:`${app.path.build.html}`
+        }
+    })
+    gulp.watch(path.src.html).on('change', browsersync.reload)
+    gulp.watch (path.src.html,  html)
+    gulp.watch (path.src.js, scripts)
+    gulp.watch (path.src.sass, task_sass)
+    gulp.watch (path.src.img, imgs)
 }
 
 const clean = () => {
     return deleteAsync(app.path.clean);
 }
 
-const server = () => {
-    browsersync.init({
-        server:{
-            baseDir:`${app.path.build.html}`
-        },
-        notify: false,
-        port: 3000,
-    });
-}
-
-const dev = gulp.series(clean, html, task_sass, scripts, imgs, css, gulp.parallel(watch, server))
+const dev = gulp.series(clean, html, task_sass, scripts, imgs, css, watch)
 gulp.task("default", dev);
