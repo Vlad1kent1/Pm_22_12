@@ -26,8 +26,8 @@ const path = {
         html: `${srcFolder}/*.html`,
         css: `${srcFolder}/css/*.css`,
         js: `${srcFolder}/js/*.js`,
-        sass:`${srcFolder}/sass/*.sass`,
-        img: `${srcFolder}/img/*.+ (jpg | jpeg | png | gif)`,
+        sass:`${srcFolder}/sass/*.scss`,
+        img: `${srcFolder}/img/*.+(jpg|jpeg|png|gif|avif|webp|svg)`,
     },
         clean:buildFolder,
         buildFolder:buildFolder,
@@ -49,20 +49,21 @@ const html = () => {
 const css = () => {
     return app.gulp.src(path.src.css)
         .pipe(app.gulp.dest(path.build.css))
+        .pipe(browsersync.stream())
 }
 
-const task_sass = () => {
+const task_sass = (done) => {
     return app.gulp.src(path.src.sass)
-    .pipe (concat ( 'styles.sass'))
+    .pipe (concat ( 'style.scss'))
     .pipe(sass().on('error', sass.logError))
     .pipe (autoprefixer ({
-        browsers: [ 'last 2 versions'],
+        overrideBrowserslist: [ 'last 2 versions'],
         cascade: false
     }))
     .pipe (cssnano ())
     .pipe (rename ({suffix: '.min'}))
-    .pipe(app.gulp.dest(path.build.sass))
-    .pipe(browsersync.stream());
+    .pipe(app.gulp.dest(path.build.css))
+    .pipe(browsersync.stream())
 }
 
 const scripts =  () => {
@@ -94,6 +95,7 @@ const watch = () => {
     gulp.watch (path.src.html,  html)
     gulp.watch (path.src.js, scripts)
     gulp.watch (path.src.sass, task_sass)
+    gulp.watch (path.src.css, css)
     gulp.watch (path.src.img, imgs)
 }
 
@@ -101,5 +103,5 @@ const clean = () => {
     return deleteAsync(app.path.clean);
 }
 
-const dev = gulp.series(clean, html, task_sass, scripts, imgs, css, watch)
+const dev = gulp.series(clean, html, task_sass, scripts, imgs, watch)
 gulp.task("default", dev);

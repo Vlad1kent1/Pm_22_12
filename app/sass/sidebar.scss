@@ -1,0 +1,32 @@
+.container-fluid{
+.sidebar{
+    margin: 10px;
+    margin-top: 20px;
+    height: 2940px;
+    color:#eee;
+    background:#297fb8;
+    .logo{
+        height: 135px;
+        margin: 0 0 80px;
+        padding: 50px 113px 45px 87px;
+        background: #1b93e1;
+    }
+    .navbar-nav{
+        h6{
+            background: #1b93e1;
+            height: 50px;
+            font-size: 1.3em;
+        }
+        ul{
+            .nav-item{
+                color: #eee;
+            }
+            i{
+                font-size: 24px;
+            }
+            span{
+                font-size: 20px;
+            }
+        }
+    }
+}}
